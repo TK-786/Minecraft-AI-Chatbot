@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+venv/
+storage/
+*.log
+.cache/
+.idea/
+*.sqlite3
+
+# OS
+.env
+
+# VS Code settings
+.vscode/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-error.log
+*.tgz
+
+package-lock.json
+yarn.lock
+
+# Minecraft server files
+minecraft-server/world/
+minecraft-server/logs/
+minecraft-server/libraries/
+minecraft-server/versions/
+
+*.log
+whitelist.json
+banned-players.json
+banned-ips.json
+ops.json
+eula.txt
+server.properties
+usercache.json
