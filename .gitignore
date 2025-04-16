@@ -28,16 +28,31 @@ package-lock.json
 yarn.lock
 
 # Minecraft server files
-minecraft-server/world/
+minecraft-server/cache/
+minecraft-server/config/
 minecraft-server/logs/
 minecraft-server/libraries/
+minecraft-server/plugins/
+minecraft-server/world/
+minecraft-server/world_nether/
+minecraft-server/world_the_end/
 minecraft-server/versions/
 
 *.log
-whitelist.json
 banned-players.json
 banned-ips.json
-ops.json
+commands.yml
 eula.txt
+help.yml
+ops.json
+permissions.yml
 server.properties
 usercache.json
+version_history.json
+whitelist.json
+
+minecraft-server/bukkit.yml
+minecraft-server/paper.yml
+minecraft-server/spigot.yml
+
+.console_history
