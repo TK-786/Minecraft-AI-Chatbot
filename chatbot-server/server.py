@@ -15,30 +15,7 @@ def chat():
 
     try:
         intents = classify_message(message)
-
-        responses = []
-
-        for intent_obj in intents:
-            intent = intent_obj.get("intent")
-
-            if intent == "chat":
-                # TODO:
-                responses.append({"action": "say", "message": intent_obj["message"]})
-
-            elif intent == "question":
-                reply = query_minecraft_chatbot(intent_obj["query"])
-                responses.append({"action": "say", "message": str(reply)})
-
-            elif intent == "action":
-                action_type = intent_obj.get("type")
-
-                if action_type == "follow":
-                    responses.append({"action": "follow"})
-
-                else:
-                    responses.append({"action": "say", "message": f"Action '{action_type}' not supported yet."})
-
-        return jsonify(responses[0] if responses else {"action": "say", "message": "No valid intent found."})
+        return jsonify(intents)
 
     except Exception as e:
         print("❌ Error:", e)
