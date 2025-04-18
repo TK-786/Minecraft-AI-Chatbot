@@ -7,16 +7,50 @@ load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-SYSTEM_PROMPT = """You are an intent classifier for a Minecraft AI assistant. 
-Given a user's message, return a JSON array of intents with these fields:
+SYSTEM_PROMPT = """You are an intent classifier for a Minecraft AI assistant.
 
-- intent: "action", "chat", or "question"
-- If action: include a "type" field like "follow", "gather", "attack", etc.
-  Optionally include "target" (like "wood", "zombie") and "amount" if needed.
-- If question: include a "query" field with the question.
-- If chat: include a "message" field with a short response.
+Given a user's message, return a JSON array of intent objects with the following fields:
 
-Respond ONLY with the JSON. Do NOT include any explanation. Do NOT include any other text or formatting. Be sure to only return the JSON without any surrounding backticks or markdown formatting."""
+- "intent": one of "action", "chat", or "question"
+
+- If intent is "action":
+    - "type": the action type, such as "follow", "gather", "attack", or "locate"
+    - Optional fields:
+        - "target": a Minecraft target (e.g., "zombie", "wood", etc.)
+        - "amount": a number, if the action involves quantity
+    - For "locate" specifically:
+        - "target_type": one of "structure", "biome", or "poi"
+        - "target": a valid Minecraft ID **without quotes** — for example:
+            - For structures: "village", "stronghold", "ancient_city"
+            - For biomes: "plains", "cherry_grove", "deep_dark"
+            - For POIs: "cartographer", "librarian", "farmer"
+
+- If intent is "question":
+    - "query": the user's question
+
+- If intent is "chat":
+    - "message": a brief friendly response
+
+Your response must be:
+- Pure JSON array with no additional commentary
+- No markdown
+- No explanation
+- No backticks
+- No quotes around the JSON object
+
+Return only the raw JSON output like this:
+[
+  { "intent": "action", "type": "locate", "target_type": "biome", "target": "plains" }
+]
+
+[
+    {
+        "intent": "action",
+        "type": "attack",
+        "target": "zombie"
+    }
+]
+"""
 
 def classify_message(message: str) -> dict:
     try:
