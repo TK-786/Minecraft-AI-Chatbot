@@ -2,8 +2,13 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import re
+from minecraft_tags import STRUCTURES, BIOMES, POI
 
 load_dotenv()
+
+structure_list = ", ".join(STRUCTURES)
+biome_list = ", ".join(BIOMES)
+poi_list = ", ".join(POI)
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -20,10 +25,15 @@ Given a user's message, return a JSON array of intent objects with the following
         - "amount": a number, if the action involves quantity
     - For "locate" specifically:
         - "target_type": one of "structure", "biome", or "poi"
-        - "target": a valid Minecraft ID **without quotes** — for example:
-            - For structures: "village", "stronghold", "ancient_city"
-            - For biomes: "plains", "cherry_grove", "deep_dark"
-            - For POIs: "cartographer", "librarian", "farmer"
+        - "target": Must be a valid Minecraft ID from one of:
+            - For structures, one of: {structure_list}
+            - For biomes, one of: {biome_list}
+            - For POIs, one of: {poi_list}
+        Ensure the target is a valid Minecraft ID from the provided lists. 
+        The target MUST be from the lists provided, not a general term.
+        Match the user's request to the closest exact Minecraft ID from the lists below. Do not invent new terms.
+        If the user says a general term like "village", convert it to the most relevant specific ID from the list, such as "village_plains".
+        You MUST pick the closest matching ID from the appropriate list (structures, biomes, POIs) and only use that.
 
 - If intent is "question":
     - "query": the user's question

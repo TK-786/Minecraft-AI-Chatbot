@@ -88,6 +88,11 @@ bot.on("chat", async (username, message) => {
         } else if (type === "attack") {
           const target = intent.target || "zombie";
           attackNearest(target);
+        } else if (type === "locate") {
+          const targetType = intent.target_type || "structure";
+          const target = intent.target || "village";
+          await sendSafeMessage(`Locating ${targetType} ${target}...`);
+          runLocate(`${targetType} ${target}`);
         } else {
           await sendSafeMessage(`Action '${type}' not supported yet.`);
         }
@@ -128,4 +133,19 @@ async function sendSafeMessage(text) {
     }
   }
 }
+
+let awaitingLocate = false;
+
+function runLocate(target) {
+  bot.chat(`/locate ${target}`);
+  awaitingLocate = true;
+}
+
+bot.on("message", (jsonMsg) => {
+  const msg = jsonMsg.toString();
+  if (awaitingLocate && msg.includes("at [")) {
+    awaitingLocate = false;
+    sendSafeMessage(msg);
+  }
+});
 // ---------------Chat----------------
