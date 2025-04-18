@@ -143,9 +143,14 @@ function runLocate(target) {
 
 bot.on("message", (jsonMsg) => {
   const msg = jsonMsg.toString();
-  if (awaitingLocate && msg.includes("at [")) {
-    awaitingLocate = false;
-    sendSafeMessage(msg);
-  }
+  if (awaitingLocate)
+    if (msg.includes("at [")) {
+      sendSafeMessage(msg);
+    } else if (msg.toLowerCase().includes("could not find")) {
+      sendSafeMessage(
+        "Couldn't find that location. Try another structure, biome, or POI."
+      );
+    }
+  awaitingLocate = false;
 });
 // ---------------Chat----------------
