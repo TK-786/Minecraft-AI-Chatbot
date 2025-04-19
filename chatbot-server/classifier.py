@@ -19,7 +19,7 @@ Given a user's message, return a JSON array of intent objects with the following
 - "intent": one of "action", "chat", or "question"
 
 - If intent is "action":
-    - "type": the action type, such as "follow", "gather", "attack", or "locate"
+    - "type": the action type, such as "follow", "gather", "attack", "give" or "locate"
     - Optional fields:
         - "target": a Minecraft target (e.g., "zombie", "wood", etc.)
         - "amount": a number, if the action involves quantity
@@ -41,6 +41,7 @@ Given a user's message, return a JSON array of intent objects with the following
 - If intent is "chat":
     - "message": a brief friendly response
 
+If the user message is "stop", the intent is "action" with type "stop".
 Your response must be:
 - Pure JSON array with no additional commentary
 - No markdown
