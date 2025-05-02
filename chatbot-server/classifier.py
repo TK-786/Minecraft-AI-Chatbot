@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv
 import re
 from minecraft_tags import STRUCTURES, BIOMES, POI
+import json
+from typing import List, Dict, Any
 
 load_dotenv()
 
@@ -63,6 +65,16 @@ Return only the raw JSON output like this:
 ]
 """
 
+def validate_intents(data: Any) -> List[Dict[str, Any]]:
+    if not isinstance(data, list):
+        raise ValueError("Classifier output is not a list")
+    for obj in data:
+        if not isinstance(obj, dict) or "intent" not in obj:
+            raise ValueError("Each intent must be a dict with an 'intent' key")
+        if obj["intent"] not in ("action", "chat", "question"):
+            raise ValueError(f"Unexpected intent: {obj['intent']}")
+    return data
+
 def classify_message(message: str) -> dict:
     try:
         response = client.chat.completions.create(
@@ -81,8 +93,14 @@ def classify_message(message: str) -> dict:
 
 
         print("Raw GPT Output:", raw)
-        parsed = eval(raw)  
-        return parsed
+        parsed = json.loads(raw)
+        intents = validate_intents(parsed)
+        return intents
+    
+    except (json.JSONDecodeError, ValueError) as e:
+        print("Invalid classifier output:", e)
+        return [{"intent": "chat", "message": "Sorry, I didn't get that."}]
+    
     except Exception as e:
         print("GPT classification failed:", e)
         return [{"intent": "chat", "message": "Hmm, I'm not sure how to respond to that. Maybe try again?"}]

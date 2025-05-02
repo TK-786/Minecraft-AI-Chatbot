@@ -43,6 +43,9 @@ def expand_query_with_llm(query):
 
 def query_minecraft_chatbot(query):
     """Expands the query, retrieves relevant documents, and synthesizes a response."""
+    if len(query) > 200:
+        query = query[:200]
+        
     expanded_query = expand_query_with_llm(query)  
     print(f"\nExpanded Query: {expanded_query}\n")
 

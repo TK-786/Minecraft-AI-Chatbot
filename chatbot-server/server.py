@@ -5,10 +5,18 @@ from classifier import classify_message
 
 app = Flask(__name__)
 
+MAX_MESSAGE_LENGTH = 200
+
 @app.route('/chat', methods=['POST'])
 def chat():
     data = request.json
-    message = data.get('message', '').strip()
+    raw_msg = data.get('message', '').strip()
+    if not isinstance(raw_msg, str) or not raw_msg.strip():
+        return jsonify([{"intent": "chat", "message": "Please say something."}])
+    if len(raw_msg) > MAX_MESSAGE_LENGTH:
+        return jsonify([{"intent": "chat", "message": "Your message is too long."}])
+    
+    message = raw_msg.strip()
     username = data.get('username', 'Player')
 
     print(f"🧠 Received from {username}: {message}")
