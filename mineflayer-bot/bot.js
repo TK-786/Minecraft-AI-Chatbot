@@ -81,51 +81,46 @@ const blockAliases = {
 
 async function gatherTarget(target, amount = 1) {
   const mcData = require("minecraft-data")(bot.version);
-  const targets = blockAliases[target.toLowerCase()] || [target.toLowerCase()];
+  const aliases = blockAliases[target.toLowerCase()] || [target.toLowerCase()];
   let gathered = 0;
 
-  bot.chat(`Searching for ${amount} ${target}...`);
+  bot.chat(`Looking for ${amount} ${target}…`);
 
-  const allBlocks = bot.findBlocks({
-    matching: (block) => targets.includes(block.name),
+  const candidates = bot.findBlocks({
+    matching: (blk) => aliases.includes(blk.name),
     maxDistance: 32,
-    count: amount * 5, // Look for extra in case of failed digs
+    count: Math.ceil(amount * 1.5),
   });
 
-  if (!allBlocks || allBlocks.length === 0) {
+  if (!candidates.length) {
     await sendSafeMessage(`Couldn't find any ${target} nearby.`);
     return;
   }
 
-  for (const pos of allBlocks) {
+  for (const pos of candidates) {
     if (cancelCurrentTask || gathered >= amount) break;
 
     try {
-      const block = bot.blockAt(pos);
-      if (!block || block.name === "air") continue;
-      if (block.boundingBox === "empty") continue;
+      const blk = bot.blockAt(pos);
+      if (!blk || blk.name === "air" || blk.boundingBox === "empty") continue;
 
       await bot.pathfinder.goto(new goals.GoalBlock(pos.x, pos.y, pos.z));
 
-      const refreshed = bot.blockAt(pos);
-      if (!refreshed || !bot.canDigBlock(refreshed)) continue;
+      const fresh = bot.blockAt(pos);
+      if (!fresh || !bot.canDigBlock(fresh)) continue;
 
-      if (gathered >= amount) break;
-
-      bot.lookAt(refreshed.position.offset(0.5, 0.5, 0.5), true);
-      await bot.dig(refreshed);
+      bot.lookAt(fresh.position.offset(0.5, 0.5, 0.5), true);
+      await bot.dig(fresh);
       gathered++;
     } catch (err) {
-      console.error(`Skipping block at ${pos}:`, err.message);
+      console.warn(`Skipping ${target} at ${pos}: ${err.message}`);
     }
   }
 
   if (gathered >= amount) {
-    await sendSafeMessage(`Successfully gathered ${gathered} ${target}.`);
+    await sendSafeMessage(`Gathered ${gathered}/${amount} ${target}.`);
   } else {
-    await sendSafeMessage(
-      `Only gathered ${gathered} out of ${amount} ${target}.`
-    );
+    await sendSafeMessage(`Gathered ${gathered}/${amount} ${target}.`);
   }
 }
 // ---------------Gather----------------
